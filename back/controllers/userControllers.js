@@ -1,10 +1,14 @@
+//  import des packages
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+//  import du modèle utilisateur
 const User = require('../models/userSchema');
 
+
+// inscription de nouveaux utilisateurs
 exports.signup = (req, res, next) => {
-    bcrypt.hash(req.body.params, 10)        //  hash le password
+    bcrypt.hash(req.body.params, 10)        //  hash du password
         .then(hash => {
             const user = new User({
                 email: req.body.email,
@@ -17,6 +21,8 @@ exports.signup = (req, res, next) => {
         .catch(error => res.status(500).json({ error }))
 };
 
+
+//  connexion de l'utilisateur ayant déjà un compte
 exports.login = (req, res, next) => {
     User.findOne({ email: req.body.email })     //  cherche un utilisateur dans la base de données
         .then(user => {

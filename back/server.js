@@ -1,5 +1,7 @@
+//  import des packages
 const http = require('http');
 const app = require('./app');
+
 
 // fonction qui renvoie un port valide
 const normalizePort = val => {
@@ -14,9 +16,11 @@ const normalizePort = val => {
     return false;
 };
 
+
 //  config du serveur
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
+
 
 //  fonction qui recherche les erreurs
 const errorHandler = error => {
@@ -39,7 +43,8 @@ const errorHandler = error => {
     }
 };
 
-// écouteur d'evenements
+
+// démarrage du serveur et écouteur d'evenements
 const server = http.createServer(app);
 
 server.on('error', errorHandler);

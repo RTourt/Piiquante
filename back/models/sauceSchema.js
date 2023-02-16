@@ -1,4 +1,6 @@
+//  import du package
 const mongoose = require('mongoose');
+
 
 //  schema de données pour la base de données MongoDb
 const sauceSchema = mongoose.Schema({

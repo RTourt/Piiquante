@@ -1,5 +1,8 @@
+//  import du package
 const jwt = require('jsonwebtoken');
 
+
+//  validation de l'userId avec le token
 module.exports = (req, res, next) => {
     try {
         const token = req.headers.authorization.split(' ')[1];              //  extraction du token se trouvant dans le header Authorization et split pour tout récupérer après l'espace dans le header  
