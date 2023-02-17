@@ -1,35 +1,46 @@
-//  import des packages
+// import des packages
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-//  import du modèle utilisateur
+// import du modèle utilisateur
 const User = require('../models/userSchema');
 
+//  utilisation de la variable d'environnement pour la clé secrete du token JWT
+const SECRET_KEY = process.env.SECRET_KEY;
 
-// inscription de nouveaux utilisateurs
+
+// inscription de nouveaux utilisateurs avec vérification de l'email et du password
 exports.signup = (req, res, next) => {
-    bcrypt.hash(req.body.params, 10)        //  hash du password
+    if (!req.body.email || !req.body.password) {
+        return res.status(400).json({ message: 'Veuillez fournir un email et un mot de passe' });
+    }
+
+    bcrypt.hash(req.body.password, 10)
         .then(hash => {
             const user = new User({
                 email: req.body.email,
-                password: hash
-            })
+                password: hash,
+            });
             user.save()
                 .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-                .catch(error => res.status(400).json({ error }))
+                .catch(error => res.status(400).json({ error }));
         })
-        .catch(error => res.status(500).json({ error }))
+        .catch(error => res.status(500).json({ error: 'Erreur serveur' }));
 };
 
 
-//  connexion de l'utilisateur ayant déjà un compte
+// connexion de l'utilisateur ayant déjà un compte
 exports.login = (req, res, next) => {
-    User.findOne({ email: req.body.email })     //  cherche un utilisateur dans la base de données
+    if (!req.body.email || !req.body.password) {
+        return res.status(400).json({ message: 'Veuillez fournir un email et un mot de passe' });
+    }
+
+    User.findOne({ email: req.body.email })
         .then(user => {
             if (!user) {
                 return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
             }
-            bcrypt.compare(req.body.password, user.password)        //  compare les hash des 2 passwords
+            bcrypt.compare(req.body.password, user.password)
                 .then(valid => {
                     if (!valid) {
                         return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
@@ -38,12 +49,12 @@ exports.login = (req, res, next) => {
                         userId: user._id,
                         token: jwt.sign(
                             { userId: user._id },
-                            'RANDOM_TOKEN_SECRET',
+                            SECRET_KEY,
                             { expiresIn: '24h' }
                         )
                     });
                 })
-                .catch(error => res.status(500).json({ error }));
+                .catch(error => res.status(500).json({ error: 'Erreur serveur' }));
         })
-        .catch(error => res.status(500).json({ error }));
+        .catch(error => res.status(500).json({ error: 'Erreur serveur' }));
 };

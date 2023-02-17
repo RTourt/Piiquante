@@ -2,29 +2,24 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
-
+require('dotenv').config();
 
 //  routes
 const sauceRoutes = require('./routes/sauceRoutes');
 const userRoutes = require('./routes/userRoutes');
 
-
 //  démarrage de l'appli Express
 const app = express();
 
-
 //  connexion à MongoDb
-mongoose
-    .connect(`mongodb+srv://Romain:Joker666@cluster0.vvgd9gn.mongodb.net/?retryWrites=true&w=majority`,
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        })
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 app.use(express.json());
-
 
 //  config des CORS
 app.use((req, res, next) => {
@@ -33,12 +28,6 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
 });
-
-
-app.use((req, res) => {
-    res.json({ message: 'Votre requête a bien été reçue !' })
-})
-
 
 //  paramêtres des routes
 app.use('/images', express.static(path.join(__dirname, 'images')));
